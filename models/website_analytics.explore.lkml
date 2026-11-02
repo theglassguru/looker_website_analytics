@@ -13,7 +13,7 @@ include: "//timeframe_filters/**/*.view.lkml"
 #
 # Every explore cross-joins timeframe_suggestions + timeframe_filters
 # for CP / PP dynamic measures. All data is as of yesterday.
-# Explore names differ from view names, so each sets view_name.
+# Explore names that differ from view names set view_name.
 
 # --- Search Console: site totals ---
 
@@ -88,6 +88,72 @@ explore: search_console_queries {
     type: left_outer
     relationship: many_to_one
     sql_on: ${gsc_queries.franchise_name} = ${etl_knack_franchises.franchise_name} ;;
+  }
+
+  join: timeframe_suggestions {
+    type: cross
+    relationship: one_to_one
+  }
+
+  join: timeframe_filters {
+    view_label: "🔻 | Timeframe Filter"
+    type: cross
+    relationship: one_to_one
+  }
+}
+
+# --- GA4: traffic by channel ---
+
+explore: ga4_channels {
+  hidden: no
+  label: "GA4 - Channels"
+  description: "Site visits and engagement by channel (All Locations property)."
+  persist_with: website_ga4_datagroup
+
+  join: timeframe_suggestions {
+    type: cross
+    relationship: one_to_one
+  }
+
+  join: timeframe_filters {
+    view_label: "🔻 | Timeframe Filter"
+    type: cross
+    relationship: one_to_one
+  }
+}
+
+# --- GA4: traffic by source / medium ---
+
+explore: ga4_sources {
+  hidden: no
+  label: "GA4 - Sources"
+  description: "Site visits and engagement by source and medium, lowercased (All Locations property)."
+  persist_with: website_ga4_datagroup
+
+  join: timeframe_suggestions {
+    type: cross
+    relationship: one_to_one
+  }
+
+  join: timeframe_filters {
+    view_label: "🔻 | Timeframe Filter"
+    type: cross
+    relationship: one_to_one
+  }
+}
+
+# --- GA4: pages and locations ---
+
+explore: ga4_pages {
+  hidden: no
+  label: "GA4 - Pages"
+  description: "Page views and engagement by page and location (All Locations property)."
+  persist_with: website_ga4_datagroup
+
+  join: etl_knack_franchises {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${ga4_pages.franchise_name} = ${etl_knack_franchises.franchise_name} ;;
   }
 
   join: timeframe_suggestions {

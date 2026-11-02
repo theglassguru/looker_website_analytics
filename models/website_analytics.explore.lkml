@@ -40,6 +40,68 @@ explore: search_console_site {
   }
 }
 
+# --- Search Console: pages and locations ---
+
+explore: search_console_pages {
+  view_name: gsc_pages
+  hidden: no
+  label: "Search Console - Pages"
+  description: "Google search by page and location (attributed, ~53% of site clicks). Defaults to web search."
+  persist_with: website_gsc_datagroup
+
+  always_filter: {
+    filters: [gsc_pages.search_type: "web"]
+  }
+
+  join: etl_knack_franchises {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${gsc_pages.franchise_name} = ${etl_knack_franchises.franchise_name} ;;
+  }
+
+  join: timeframe_suggestions {
+    type: cross
+    relationship: one_to_one
+  }
+
+  join: timeframe_filters {
+    view_label: "🔻 | Timeframe Filter"
+    type: cross
+    relationship: one_to_one
+  }
+}
+
+# --- Search Console: search terms ---
+
+explore: search_console_queries {
+  view_name: gsc_queries
+  hidden: no
+  label: "Search Console - Search Terms"
+  description: "Google search by search term, page, and location (attributed, ~53% of site clicks). Defaults to web search."
+  persist_with: website_gsc_datagroup
+
+  always_filter: {
+    filters: [gsc_queries.search_type: "web"]
+  }
+
+  join: etl_knack_franchises {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${gsc_queries.franchise_name} = ${etl_knack_franchises.franchise_name} ;;
+  }
+
+  join: timeframe_suggestions {
+    type: cross
+    relationship: one_to_one
+  }
+
+  join: timeframe_filters {
+    view_label: "🔻 | Timeframe Filter"
+    type: cross
+    relationship: one_to_one
+  }
+}
+
 # --- Location slug map (admin / validation) ---
 
 explore: location_slugs {

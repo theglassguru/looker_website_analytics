@@ -15,6 +15,54 @@ include: "//timeframe_filters/**/*.view.lkml"
 # for CP / PP dynamic measures. All data is as of yesterday.
 # Explore names that differ from view names set view_name.
 
+# --- Scorecard: whole site, one row per day ---
+
+explore: website_overview {
+  view_name: website_network_daily
+  hidden: no
+  label: "Website - Overview"
+  description: "Whole-site scorecard by day: Google search, sessions, page views, daily visitors."
+  persist_with: website_analytics_datagroup
+
+  join: timeframe_suggestions {
+    type: cross
+    relationship: one_to_one
+  }
+
+  join: timeframe_filters {
+    view_label: "🔻 | Timeframe Filter"
+    type: cross
+    relationship: one_to_one
+  }
+}
+
+# --- Scorecard: by location, one row per location per day ---
+
+explore: website_locations {
+  view_name: website_location_daily
+  hidden: no
+  label: "Website - Locations"
+  description: "Location scorecard: search impressions, clicks, and page views for every location's pages."
+  persist_with: website_analytics_datagroup
+
+  join: etl_knack_franchises {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${website_location_daily.franchise_name} = ${etl_knack_franchises.franchise_name} ;;
+  }
+
+  join: timeframe_suggestions {
+    type: cross
+    relationship: one_to_one
+  }
+
+  join: timeframe_filters {
+    view_label: "🔻 | Timeframe Filter"
+    type: cross
+    relationship: one_to_one
+  }
+}
+
 # --- Search Console: site totals ---
 
 explore: search_console_site {
